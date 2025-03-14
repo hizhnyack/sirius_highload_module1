@@ -23,11 +23,14 @@ public class SaleController {
                            @RequestParam String date) {
         LocalDate saleDate = LocalDate.parse(date);
         saleService.createSale(productId, customerId, weight, saleDate);
-        return saleService.findAll().get(saleService.findAll().size() - 1);
+
+        // Возвращаем последнюю добавленную продажу
+        List<Sale> sales = saleService.findAll();
+        return sales.get(sales.size() - 1);
     }
 
-    @GetMapping("/average-weight/{productId}")
-    public double getAverageWeightLastMonth(@PathVariable Long productId) {
-        return saleService.calculateAverageWeightLastMonth(productId);
+    @GetMapping
+    public List<Sale> getAllSales() {
+        return saleService.findAll();
     }
 }

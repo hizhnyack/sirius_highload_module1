@@ -1,11 +1,13 @@
 package ru.hpclab.hl.module1.repository;
 
+import org.springframework.stereotype.Repository;
 import ru.hpclab.hl.module1.model.Product;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
+@Repository // Добавляем аннотацию
 public class ProductRepository {
     private static final List<Product> products = new ArrayList<>();
 

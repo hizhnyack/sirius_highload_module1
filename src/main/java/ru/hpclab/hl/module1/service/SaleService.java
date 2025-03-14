@@ -1,5 +1,6 @@
 package ru.hpclab.hl.module1.service;
 
+import org.springframework.stereotype.Service;
 import ru.hpclab.hl.module1.model.Customer;
 import ru.hpclab.hl.module1.model.Product;
 import ru.hpclab.hl.module1.model.Sale;
@@ -11,6 +12,7 @@ import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 
+@Service
 public class SaleService {
     private final ProductRepository productRepository;
     private final CustomerRepository customerRepository;
@@ -43,16 +45,24 @@ public class SaleService {
         LocalDate now = LocalDate.now();
         LocalDate lastMonth = now.minusMonths(1);
 
-        List<Sale> sales = saleRepository.findAll().stream()
+        List<Sale> salesLastMonth = saleRepository.findAll().stream()
                 .filter(sale -> sale.getProduct().getId().equals(productId))
-                .filter(sale -> sale.getDate().isAfter(lastMonth))
+                .filter(sale -> !sale.getDate().isBefore(lastMonth)) // Продажи не раньше lastMonth
+                .filter(sale -> !sale.getDate().isAfter(now)) // Продажи не позже now
                 .toList();
 
-        if (sales.isEmpty()) {
+        if (salesLastMonth.isEmpty()) {
             return 0;
         }
 
-        double totalWeight = sales.stream().mapToDouble(Sale::getWeight).sum();
-        return totalWeight / sales.size();
+        double totalWeight = salesLastMonth.stream()
+                .mapToDouble(Sale::getWeight)
+                .sum();
+
+        return totalWeight / salesLastMonth.size();
+    }
+
+    public List<Sale> findAll() {
+        return saleRepository.findAll();
     }
 }
