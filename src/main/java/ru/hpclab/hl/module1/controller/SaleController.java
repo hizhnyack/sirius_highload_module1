@@ -6,6 +6,7 @@ import ru.hpclab.hl.module1.service.SaleService;
 
 import java.util.List;
 import java.time.LocalDate;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/sales")
@@ -31,8 +32,13 @@ public class SaleController {
         return saleService.findAll();
     }
 
-    @GetMapping("/average-weight/{productId}")
+    @GetMapping("/average-weight/{productId}") // Endpoint для одного товара
     public double getAverageWeightLastMonth(@PathVariable Long productId) {
         return saleService.calculateAverageWeightLastMonth(productId);
+    }
+
+    @GetMapping("/average-weight") // Endpoint для всех товаров
+    public Map<Long, Double> getAverageWeightLastMonth() {
+        return saleService.calculateAverageWeightLastMonth();
     }
 }
