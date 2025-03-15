@@ -7,7 +7,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
-@Repository // Добавляем аннотацию
+@Repository
 public class ProductRepository {
     private static final List<Product> products = new ArrayList<>();
 

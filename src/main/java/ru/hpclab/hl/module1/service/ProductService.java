@@ -6,7 +6,7 @@ import ru.hpclab.hl.module1.repository.ProductRepository;
 
 import java.util.List;
 
-@Service // Убедитесь, что аннотация есть
+@Service
 public class ProductService {
     private final ProductRepository productRepository;
 
