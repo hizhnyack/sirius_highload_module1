@@ -19,8 +19,7 @@
 ## LAB1
 1. Использовать в качестве шаблона код из ветки `feature/spring-boot-test`:  
    [https://bitbucket.org/zil-courses/hl-module1/src/main/](https://bitbucket.org/zil-courses/hl-module1/src/main/)
-2. Переделать проект в IntelliJ IDEA под свою бизнес-постановку:  
-   [Документ с постановкой](https://docs.google.com/document/d/1J4uhP4-q98WRGWdvPSACE9XhxGEI68ie/edit)  
+2. Переделать проект в IntelliJ IDEA под свою бизнес-постановку 
    (в качестве реализации компонентов репозиториев использовать статические поля-коллекции Java).
 3. Закоммитить в свой git и показать преподавателю.
 
