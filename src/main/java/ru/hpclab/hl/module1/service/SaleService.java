@@ -10,6 +10,8 @@ import ru.hpclab.hl.module1.repository.SaleRepository;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 import java.util.Optional;
 
 @Service
@@ -60,6 +62,24 @@ public class SaleService {
                 .sum();
 
         return totalWeight / salesLastMonth.size();
+    }
+
+    public Map<Long, Double> calculateAverageWeightLastMonth() {
+        LocalDate now = LocalDate.now();
+        LocalDate lastMonth = now.minusMonths(1);
+
+        // Фильтруем продажи за последний месяц
+        List<Sale> salesLastMonth = saleRepository.findAll().stream()
+                .filter(sale -> !sale.getDate().isBefore(lastMonth)) // Продажи не раньше lastMonth
+                .filter(sale -> !sale.getDate().isAfter(now)) // Продажи не позже now
+                .toList();
+
+        // Группируем продажи по productId и рассчитываем средний вес
+        return salesLastMonth.stream()
+                .collect(Collectors.groupingBy(
+                        sale -> sale.getProduct().getId(), // Группировка по productId
+                        Collectors.averagingDouble(Sale::getWeight) // Средний вес
+                ));
     }
 
     public List<Sale> findAll() {
