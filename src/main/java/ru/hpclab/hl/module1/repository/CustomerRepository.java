@@ -7,7 +7,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
-@Repository // Добавляем аннотацию
+@Repository
 public class CustomerRepository {
     private static final List<Customer> customers = new ArrayList<>();
 

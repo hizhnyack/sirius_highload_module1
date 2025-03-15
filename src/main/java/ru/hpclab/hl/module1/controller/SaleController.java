@@ -4,8 +4,8 @@ import org.springframework.web.bind.annotation.*;
 import ru.hpclab.hl.module1.model.Sale;
 import ru.hpclab.hl.module1.service.SaleService;
 
-import java.time.LocalDate;
 import java.util.List;
+import java.time.LocalDate;
 
 @RestController
 @RequestMapping("/sales")
@@ -23,14 +23,16 @@ public class SaleController {
                            @RequestParam String date) {
         LocalDate saleDate = LocalDate.parse(date);
         saleService.createSale(productId, customerId, weight, saleDate);
-
-        // Возвращаем последнюю добавленную продажу
-        List<Sale> sales = saleService.findAll();
-        return sales.get(sales.size() - 1);
+        return saleService.findAll().get(saleService.findAll().size() - 1);
     }
 
-    @GetMapping
+    @GetMapping // Добавляем метод для обработки GET-запросов
     public List<Sale> getAllSales() {
         return saleService.findAll();
+    }
+
+    @GetMapping("/average-weight/{productId}")
+    public double getAverageWeightLastMonth(@PathVariable Long productId) {
+        return saleService.calculateAverageWeightLastMonth(productId);
     }
 }
