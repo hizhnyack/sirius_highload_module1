@@ -1,13 +1,25 @@
 package ru.hpclab.hl.module1.model;
 
 import java.util.Objects;
+import jakarta.persistence.*;
+import lombok.Data;
 
+@Data
+@Entity
+@Table(name = "customers")
 public class Customer {
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    private String fullName;
-    private String phone;
-    private boolean hasDiscountCard;
 
+    @Column(nullable = false)
+    private String fullName;
+
+    @Column(nullable = false)
+    private String phone;
+
+    @Column(nullable = false)
+    private boolean hasDiscountCard;
     // Конструкторы
     public Customer() {}
 

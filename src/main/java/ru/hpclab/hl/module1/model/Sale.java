@@ -2,13 +2,32 @@ package ru.hpclab.hl.module1.model;
 
 import java.time.LocalDate;
 import java.util.Objects;
+import jakarta.persistence.*;
+import lombok.Data;
 
+@Data
+@Entity
+@Table(name = "sales")
 public class Sale {
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+
+    @ManyToOne
+    @JoinColumn(name = "product_id", nullable = false)
     private Product product;
+
+    @ManyToOne
+    @JoinColumn(name = "customer_id", nullable = false)
     private Customer customer;
+
+    @Column(nullable = false)
     private LocalDate date;
+
+    @Column(nullable = false)
     private double weight;
+
+    @Column(nullable = false)
     private double totalCost;
 
     // Конструкторы
