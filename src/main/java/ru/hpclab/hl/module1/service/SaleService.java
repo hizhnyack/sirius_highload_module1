@@ -47,10 +47,8 @@ public class SaleService {
         LocalDate now = LocalDate.now();
         LocalDate lastMonth = now.minusMonths(1);
 
-        List<Sale> salesLastMonth = saleRepository.findAll().stream()
+        List<Sale> salesLastMonth = saleRepository.findByDateBetween(lastMonth, now).stream()
                 .filter(sale -> sale.getProduct().getId().equals(productId))
-                .filter(sale -> !sale.getDate().isBefore(lastMonth)) // Продажи не раньше lastMonth
-                .filter(sale -> !sale.getDate().isAfter(now)) // Продажи не позже now
                 .toList();
 
         if (salesLastMonth.isEmpty()) {
@@ -68,17 +66,12 @@ public class SaleService {
         LocalDate now = LocalDate.now();
         LocalDate lastMonth = now.minusMonths(1);
 
-        // Фильтруем продажи за последний месяц
-        List<Sale> salesLastMonth = saleRepository.findAll().stream()
-                .filter(sale -> !sale.getDate().isBefore(lastMonth)) // Продажи не раньше lastMonth
-                .filter(sale -> !sale.getDate().isAfter(now)) // Продажи не позже now
-                .toList();
+        List<Sale> salesLastMonth = saleRepository.findByDateBetween(lastMonth, now);
 
-        // Группируем продажи по productId и рассчитываем средний вес
         return salesLastMonth.stream()
                 .collect(Collectors.groupingBy(
-                        sale -> sale.getProduct().getId(), // Группировка по productId
-                        Collectors.averagingDouble(Sale::getWeight) // Средний вес
+                        sale -> sale.getProduct().getId(),
+                        Collectors.averagingDouble(Sale::getWeight)
                 ));
     }
 
