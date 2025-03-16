@@ -1,11 +1,24 @@
 package ru.hpclab.hl.module1.model;
 
 import java.util.Objects;
+import jakarta.persistence.*;
+import lombok.Data;
 
+@Data
+@Entity
+@Table(name = "products")
 public class Product {
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+
+    @Column(nullable = false)
     private String name;
+
+    @Column(nullable = false)
     private String category; // Овощи/Фрукты
+
+    @Column(nullable = false)
     private double pricePerKg;
 
     // Конструкторы
