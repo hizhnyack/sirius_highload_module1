@@ -59,7 +59,8 @@ public class SaleService {
                 .mapToDouble(Sale::getWeight)
                 .sum();
 
-        return totalWeight / salesLastMonth.size();
+        double average = totalWeight / salesLastMonth.size();
+        return Math.round(average * 100.0) / 100.0;  // Округление до сотых
     }
 
     public Map<Long, Double> calculateAverageWeightLastMonth() {
@@ -71,7 +72,10 @@ public class SaleService {
         return salesLastMonth.stream()
                 .collect(Collectors.groupingBy(
                         sale -> sale.getProduct().getId(),
-                        Collectors.averagingDouble(Sale::getWeight)
+                        Collectors.collectingAndThen(
+                                Collectors.averagingDouble(Sale::getWeight),
+                                avg -> Math.round(avg * 100.0) / 100.0  // Округление до сотых
+                        )
                 ));
     }
 
