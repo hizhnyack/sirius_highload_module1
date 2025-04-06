@@ -132,7 +132,7 @@ CREATE TABLE sales (
 # Запуск генерации
 if __name__ == "__main__":
     try:
-        # Используем абсолютный путь для файла
+        # Используется абсолютный путь для файла
         output_dir = os.getenv('OUTPUT_DIR', os.getcwd())
         output_file = os.path.join(output_dir, "initdb.sql")
         print(f"Путь для выходного файла: {output_file}")
