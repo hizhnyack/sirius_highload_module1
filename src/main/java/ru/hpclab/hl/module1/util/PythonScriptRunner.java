@@ -84,7 +84,7 @@ public class PythonScriptRunner {
                 Files.copy(generatedFile.toPath(), new File("initdb.sql").toPath(), StandardCopyOption.REPLACE_EXISTING);
                 logger.info("Generated initdb.sql copied to current directory");
                 
-                // Выполняем SQL-скрипт
+                // Выполняется SQL-скрипт
                 try (Connection connection = dataSource.getConnection()) {
                     logger.info("Executing SQL script from {}", generatedFile.getAbsolutePath());
                     ScriptUtils.executeSqlScript(connection, new FileSystemResource(generatedFile));
