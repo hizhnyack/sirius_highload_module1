@@ -1,7 +1,7 @@
 package ru.hpclab.hl.module1.model;
 
 import java.util.Objects;
-import jakarta.persistence.*;
+import javax.persistence.*;
 import lombok.Data;
 
 @Data
