@@ -61,7 +61,7 @@ for timestamp in timestamps:
 plt.figure(figsize=(10, 6))
 
 # График времени отклика
-plt.plot(timestamps, response_times, label='Время отклика (ms)', color='blue')
+plt.plot(timestamps, response_times, label='Время отклика, мс', color='blue')
 
 # График нагрузки (VUs)
 plt.twinx()
@@ -70,7 +70,7 @@ plt.plot(active_vus_timestamps, active_vus_values, label='Нагрузка(Activ
 # Настройка осей и заголовков
 plt.title('Время отклика vs Нагрузка')
 plt.xlabel('Время')
-plt.ylabel('Время отклика (ms)')
+plt.ylabel('Время отклика, мс')
 plt.legend(loc='upper left')
 
 # Отображение графика

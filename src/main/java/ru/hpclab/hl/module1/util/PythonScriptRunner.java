@@ -1,6 +1,5 @@
 package ru.hpclab.hl.module1.util;
 
-import org.springframework.stereotype.Component;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -19,7 +18,6 @@ import java.util.Map;
 import javax.sql.DataSource;
 import java.sql.Connection;
 
-@Component
 public class PythonScriptRunner {
     private static final Logger logger = LoggerFactory.getLogger(PythonScriptRunner.class);
     
