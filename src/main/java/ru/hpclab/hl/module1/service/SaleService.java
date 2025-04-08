@@ -1,5 +1,6 @@
 package ru.hpclab.hl.module1.service;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import ru.hpclab.hl.module1.model.Customer;
 import ru.hpclab.hl.module1.model.Product;
@@ -20,27 +21,24 @@ public class SaleService {
     private final CustomerRepository customerRepository;
     private final SaleRepository saleRepository;
 
+    @Autowired
     public SaleService(ProductRepository productRepository, CustomerRepository customerRepository, SaleRepository saleRepository) {
         this.productRepository = productRepository;
         this.customerRepository = customerRepository;
         this.saleRepository = saleRepository;
     }
 
-    public void createSale(Long productId, Long customerId, double weight, LocalDate date) {
-        Optional<Product> productOpt = productRepository.findById(productId);
-        Optional<Customer> customerOpt = customerRepository.findById(customerId);
-
-        if (productOpt.isEmpty() || customerOpt.isEmpty()) {
-            throw new IllegalArgumentException("Product or Customer not found");
-        }
-
-        Product product = productOpt.get();
-        Customer customer = customerOpt.get();
+    public Sale createSale(Long productId, Long customerId, double weight, LocalDate date) {
+        Product product = productRepository.findById(productId)
+                .orElseThrow(() -> new IllegalArgumentException("Product not found with id: " + productId));
+                
+        Customer customer = customerRepository.findById(customerId)
+                .orElseThrow(() -> new IllegalArgumentException("Customer not found with id: " + customerId));
 
         double totalCost = product.getPricePerKg() * weight;
         Sale sale = new Sale(null, product, customer, date, weight, totalCost);
 
-        saleRepository.save(sale);
+        return saleRepository.save(sale);
     }
 
     public double calculateAverageWeightLastMonth(Long productId) {
@@ -81,5 +79,21 @@ public class SaleService {
 
     public List<Sale> findAll() {
         return saleRepository.findAll();
+    }
+
+    public Optional<Sale> findById(Long id) {
+        return saleRepository.findById(id);
+    }
+
+    public Sale save(Sale sale) {
+        return saleRepository.save(sale);
+    }
+
+    public void deleteById(Long id) {
+        saleRepository.deleteById(id);
+    }
+
+    public void deleteAll() {
+        saleRepository.deleteAll();
     }
 }
