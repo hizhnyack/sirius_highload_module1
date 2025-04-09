@@ -75,4 +75,14 @@ public class SaleController {
     public Map<Long, Double> getAverageWeightLastMonth() {
         return saleService.calculateAverageWeightLastMonth();
     }
+
+    @GetMapping("/average-weight-all-time/{productId}")
+    public double getAverageWeightAllTime(@PathVariable Long productId) {
+        return saleService.calculateAverageWeightAllTime(productId);
+    }
+
+    @GetMapping("/average-weight-all-time")
+    public Map<Long, Double> getAverageWeightAllTime() {
+        return saleService.calculateAverageWeightAllTime();
+    }
 }

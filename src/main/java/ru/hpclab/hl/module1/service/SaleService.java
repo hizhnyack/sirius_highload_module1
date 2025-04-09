@@ -35,7 +35,7 @@ public class SaleService {
         Customer customer = customerRepository.findById(customerId)
                 .orElseThrow(() -> new IllegalArgumentException("Customer not found with id: " + customerId));
 
-        double totalCost = product.getPricePerKg() * weight;
+        double totalCost = Math.round(product.getPricePerKg() * weight * 100.0) / 100.0;
         Sale sale = new Sale(null, product, customer, date, weight, totalCost);
 
         return saleRepository.save(sale);
@@ -95,5 +95,35 @@ public class SaleService {
 
     public void deleteAll() {
         saleRepository.deleteAll();
+    }
+
+    public double calculateAverageWeightAllTime(Long productId) {
+        List<Sale> sales = saleRepository.findAll().stream()
+                .filter(sale -> sale.getProduct().getId().equals(productId))
+                .toList();
+
+        if (sales.isEmpty()) {
+            return 0;
+        }
+
+        double totalWeight = sales.stream()
+                .mapToDouble(Sale::getWeight)
+                .sum();
+
+        double average = totalWeight / sales.size();
+        return Math.round(average * 100.0) / 100.0;
+    }
+
+    public Map<Long, Double> calculateAverageWeightAllTime() {
+        List<Sale> allSales = saleRepository.findAll();
+
+        return allSales.stream()
+                .collect(Collectors.groupingBy(
+                        sale -> sale.getProduct().getId(),
+                        Collectors.collectingAndThen(
+                                Collectors.averagingDouble(Sale::getWeight),
+                                avg -> Math.round(avg * 100.0) / 100.0
+                        )
+                ));
     }
 }

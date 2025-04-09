@@ -9,6 +9,29 @@ import time
 fake = Faker('ru_RU')
 session = requests.Session()
 
+# Словари для генерации названий продуктов
+PRODUCT_TYPES = [
+    'колбаса', 'сосиски', 'ветчина', 'курица', 'говядина', 'свинина', 'рыба', 'креветки',
+    'огурцы', 'помидоры', 'картофель', 'морковь', 'лук', 'капуста', 'перец', 'баклажаны',
+    'яблоки', 'груши', 'бананы', 'апельсины', 'мандарины', 'лимон', 'виноград', 'персики',
+    'молоко', 'кефир', 'творог', 'сметана', 'сыр', 'йогурт', 'масло', 'сгущенка',
+    'хлеб', 'булочки', 'батон', 'круассан', 'пирожки', 'печенье', 'торт', 'пирог',
+    'яйца', 'майонез', 'кетчуп', 'горчица', 'соль', 'сахар', 'мука', 'рис',
+    'макароны', 'гречка', 'овсянка', 'манка', 'пшено', 'перловка', 'кукуруза', 'горох',
+    'чай', 'кофе', 'какао', 'сок', 'вода', 'лимонад', 'компот', 'морс'
+]
+
+PRODUCT_ADJECTIVES = [
+    'Дружба народов', 'Зелёный удав', 'Красный великан', 'Золотой урожай', 'Свежий ветер',
+    'Весенний', 'Летний', 'Осенний', 'Зимний', 'Домашний', 'Деревенский', 'Фермерский',
+    'Экстра', 'Премиум', 'Люкс', 'Классический', 'Традиционный', 'Особый', 'Отборный',
+    'Сочный', 'Сладкий', 'Ароматный', 'Нежный', 'Свежий', 'Хрустящий', 'Мягкий', 'Твердый',
+    'Быстрый', 'Мгновенный', 'Растворимый', 'Натуральный', 'Органический', 'Экологичный',
+    'Диетический', 'Фитнес', 'Лайт', 'Без сахара', 'Без глютена', 'Без лактозы',
+    'Сливочный', 'Шоколадный', 'Ванильный', 'Карамельный', 'Фруктовый', 'Ягодный',
+    'Ореховый', 'Медовый', 'Кленовый', 'Кокосовый', 'Мятный', 'Имбирный'
+]
+
 def clear_data(base_url):
     """Очистка всех данных"""
     endpoints = ['/api/products/clear', '/api/customers/clear', '/api/sales/clear']
@@ -20,12 +43,22 @@ def clear_data(base_url):
         except requests.exceptions.RequestException as e:
             print(f"Ошибка при очистке {endpoint}: {e}")
 
+def generate_phone_number():
+    """Генерация телефонного номера в формате +7 (XXX) XXX-XX-XX"""
+    area_code = random.randint(900, 999)
+    first_part = random.randint(100, 999)
+    second_part = random.randint(10, 99)
+    third_part = random.randint(10, 99)
+    return f"+7 ({area_code}) {first_part}-{second_part}-{third_part}"
+
 def generate_products(base_url, count):
     """Генерация продуктов"""
     categories = ['Овощи', 'Фрукты']
     for _ in range(count):
+        product_type = random.choice(PRODUCT_TYPES)
+        adjective = random.choice(PRODUCT_ADJECTIVES)
         product = {
-            'name': fake.word().capitalize(),
+            'name': f"{product_type} {adjective}",
             'category': random.choice(categories),
             'pricePerKg': round(random.uniform(50, 500), 2)
         }
@@ -39,13 +72,15 @@ def generate_customers(base_url, count):
     """Генерация клиентов"""
     for _ in range(count):
         customer = {
-            'name': fake.name(),
-            'email': fake.email(),
-            'phone': fake.phone_number()
+            'fullName': fake.name(),
+            'phone': generate_phone_number(),
+            'hasDiscountCard': random.choice([True, False])
         }
         try:
-            response = session.post(f"{base_url}/api/customers", json=customer)
+            url = base_url.rstrip('/') + '/api/customers'
+            response = session.post(url, json=customer)
             response.raise_for_status()
+            print(f"Успешно создан клиент: {response.json()}")
         except requests.exceptions.RequestException as e:
             print(f"Ошибка при создании клиента: {e}")
 
@@ -101,12 +136,14 @@ def main():
     parser.add_argument('--count', type=int, default=500, help='Количество создаваемых объектов')
     parser.add_argument('--endpoint', type=str, required=True, help='API-эндпоинт (products, customers, sales)')
     parser.add_argument('--base-url', type=str, default='http://localhost:8080/', help='Базовый URL API')
-    
+    parser.add_argument('--clear', action='store_true', help='Очистить данные перед генерацией')
+
     args = parser.parse_args()
 
-    # Очищаем данные
-    clear_data(args.base_url)
-    time.sleep(1)  # Даем время на очистку
+    # Очищаем данные только если указан флаг --clear
+    if args.clear:
+        clear_data(args.base_url)
+        time.sleep(1)  # Даем время на очистку
 
     # Генерируем данные в зависимости от эндпоинта
     if args.endpoint == 'products':
