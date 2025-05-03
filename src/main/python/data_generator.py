@@ -106,7 +106,8 @@ def generate_products(base_url, count):
             'pricePerKg': round(random.uniform(50, 500), 2)
         }
         try:
-            response = session.post(f"{base_url}/api/products", json=product)
+            url = base_url.rstrip('/') + '/api/products'
+            response = session.post(url, json=product)
             response.raise_for_status()
             product_data = response.json()
             # Выводим информацию только о первых нескольких продуктах (опционально)
@@ -121,10 +122,15 @@ def generate_sales(base_url, count):
     print("Начинаю генерацию продаж...")
     try:
         print("Получаю список продуктов...")
-        products = session.get(f"{base_url}/api/products").json()
+        products_response = session.get(base_url.rstrip('/') + '/api/products')
+        products_response.raise_for_status()
+        products = products_response.json()
         print(f"Получено {len(products)} продуктов")
+        
         print("Получаю список клиентов...")
-        customers = session.get(f"{base_url}/api/customers").json()
+        customers_response = session.get(base_url.rstrip('/') + '/api/customers')
+        customers_response.raise_for_status()
+        customers = customers_response.json()
         print(f"Получено {len(customers)} клиентов")
     except requests.exceptions.RequestException as e:
         print(f"Ошибка при получении данных: {e}")
@@ -148,7 +154,8 @@ def generate_sales(base_url, count):
             'date': date
         }
         try:
-            response = session.post(f"{base_url}/api/sales/create", json=sale)
+            url = base_url.rstrip('/') + '/api/sales/create'
+            response = session.post(url, json=sale)
             response.raise_for_status()
             sale_data = response.json()
             total_price = round(weight * product['pricePerKg'], 2)
@@ -175,7 +182,7 @@ def main():
     parser = argparse.ArgumentParser(description='Генератор тестовых данных для REST-сервиса')
     parser.add_argument('--count', type=int, default=500, help='Количество создаваемых объектов')
     parser.add_argument('--endpoint', type=str, help='API-эндпоинт (products, customers, sales, all)')
-    parser.add_argument('--url', type=str, default='http://localhost:8080/', help='URL API')
+    parser.add_argument('--url', type=str, default='http://localhost:8080', help='URL API')
     parser.add_argument('--clear', type=str, help='Очистить данные (customers, products, sales или all)')
 
     args = parser.parse_args()
