@@ -3,7 +3,7 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
-    container_name: farmers_market_app
+    container_name: farmers-market-app
     ports:
       - "8080:8080"
     environment:
@@ -14,11 +14,23 @@ services:
       postgres:
         condition: service_healthy
     networks:
-      - farmers_market_network
+      - farmers-market-network
+
+  additional-service:
+    build:
+      context: ./additional-service
+      dockerfile: Dockerfile
+    container_name: farmers-market-additional
+    ports:
+      - "8081:8081"
+    environment:
+      MAIN_SERVICE_URL: http://farmers-market-app:8080
+    networks:
+      - farmers-market-network
 
   postgres:
     image: postgres:17
-    container_name: farmers_market_db
+    container_name: farmers-market-db
     environment:
       POSTGRES_DB: farmers_market
       POSTGRES_USER: postgres
@@ -33,7 +45,7 @@ services:
       timeout: 5s
       retries: 5
     networks:
-      - farmers_market_network
+      - farmers-market-network
 
   pgadmin:
     image: dpage/pgadmin4
@@ -47,11 +59,11 @@ services:
       postgres:
         condition: service_healthy
     networks:
-      - farmers_market_network
+      - farmers-market-network
 
 volumes:
   postgres_data:
 
 networks:
-  farmers_market_network:
+  farmers-market-network:
     driver: bridge

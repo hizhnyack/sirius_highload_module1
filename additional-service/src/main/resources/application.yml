@@ -1,0 +1,10 @@
+server:
+  port: 8081
+
+spring:
+  application:
+    name: additional-service
+
+main:
+  service:
+    url: http://farmers-market-app:8080 

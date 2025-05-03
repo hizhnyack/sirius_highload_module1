@@ -11,8 +11,6 @@ import ru.hpclab.hl.module1.repository.SaleRepository;
 
 import java.time.LocalDate;
 import java.util.List;
-import java.util.Map;
-import java.util.stream.Collectors;
 import java.util.Optional;
 
 @Service
@@ -41,44 +39,12 @@ public class SaleService {
         return saleRepository.save(sale);
     }
 
-    public double calculateAverageWeightLastMonth(Long productId) {
-        LocalDate now = LocalDate.now();
-        LocalDate lastMonth = now.minusMonths(1);
-
-        List<Sale> salesLastMonth = saleRepository.findByDateBetween(lastMonth, now).stream()
-                .filter(sale -> sale.getProduct().getId().equals(productId))
-                .toList();
-
-        if (salesLastMonth.isEmpty()) {
-            return 0;
-        }
-
-        double totalWeight = salesLastMonth.stream()
-                .mapToDouble(Sale::getWeight)
-                .sum();
-
-        double average = totalWeight / salesLastMonth.size();
-        return Math.round(average * 100.0) / 100.0;  // Округление до сотых
-    }
-
-    public Map<Long, Double> calculateAverageWeightLastMonth() {
-        LocalDate now = LocalDate.now();
-        LocalDate lastMonth = now.minusMonths(1);
-
-        List<Sale> salesLastMonth = saleRepository.findByDateBetween(lastMonth, now);
-
-        return salesLastMonth.stream()
-                .collect(Collectors.groupingBy(
-                        sale -> sale.getProduct().getId(),
-                        Collectors.collectingAndThen(
-                                Collectors.averagingDouble(Sale::getWeight),
-                                avg -> Math.round(avg * 100.0) / 100.0  // Округление до сотых
-                        )
-                ));
-    }
-
     public List<Sale> findAll() {
         return saleRepository.findAll();
+    }
+
+    public List<Sale> findByDateBetween(LocalDate startDate, LocalDate endDate) {
+        return saleRepository.findByDateBetween(startDate, endDate);
     }
 
     public Optional<Sale> findById(Long id) {
@@ -95,35 +61,5 @@ public class SaleService {
 
     public void deleteAll() {
         saleRepository.deleteAll();
-    }
-
-    public double calculateAverageWeightAllTime(Long productId) {
-        List<Sale> sales = saleRepository.findAll().stream()
-                .filter(sale -> sale.getProduct().getId().equals(productId))
-                .toList();
-
-        if (sales.isEmpty()) {
-            return 0;
-        }
-
-        double totalWeight = sales.stream()
-                .mapToDouble(Sale::getWeight)
-                .sum();
-
-        double average = totalWeight / sales.size();
-        return Math.round(average * 100.0) / 100.0;
-    }
-
-    public Map<Long, Double> calculateAverageWeightAllTime() {
-        List<Sale> allSales = saleRepository.findAll();
-
-        return allSales.stream()
-                .collect(Collectors.groupingBy(
-                        sale -> sale.getProduct().getId(),
-                        Collectors.collectingAndThen(
-                                Collectors.averagingDouble(Sale::getWeight),
-                                avg -> Math.round(avg * 100.0) / 100.0
-                        )
-                ));
     }
 }

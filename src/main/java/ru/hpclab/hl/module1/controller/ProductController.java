@@ -36,16 +36,6 @@ public class ProductController {
         return productService.save(product);
     }
 
-    @PutMapping("/{id}")
-    public ResponseEntity<Product> update(@PathVariable Long id, @RequestBody Product product) {
-        Optional<Product> existingProduct = productService.findById(id);
-        if (existingProduct.isPresent()) {
-            product.setId(id);
-            return ResponseEntity.ok(productService.save(product));
-        }
-        return ResponseEntity.notFound().build();
-    }
-
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> delete(@PathVariable Long id) {
         Optional<Product> product = productService.findById(id);

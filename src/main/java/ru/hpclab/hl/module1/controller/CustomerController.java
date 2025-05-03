@@ -36,16 +36,6 @@ public class CustomerController {
         return customerService.save(customer);
     }
 
-    @PutMapping("/{id}")
-    public ResponseEntity<Customer> update(@PathVariable Long id, @RequestBody Customer customer) {
-        Optional<Customer> existingCustomer = customerService.findById(id);
-        if (existingCustomer.isPresent()) {
-            customer.setId(id);
-            return ResponseEntity.ok(customerService.save(customer));
-        }
-        return ResponseEntity.notFound().build();
-    }
-
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> delete(@PathVariable Long id) {
         Optional<Customer> customer = customerService.findById(id);
