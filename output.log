@@ -1,0 +1,11 @@
+Data in sales cleared successfully
+Failed to create sale: {"timestamp":"2025-04-08T20:39:56.577+00:00","status":405,"error":"Method Not Allowed","path":"/api/sales"}
+Failed to create sale: {"timestamp":"2025-04-08T20:39:56.591+00:00","status":405,"error":"Method Not Allowed","path":"/api/sales"}
+Failed to create sale: {"timestamp":"2025-04-08T20:39:56.605+00:00","status":405,"error":"Method Not Allowed","path":"/api/sales"}
+Failed to create sale: {"timestamp":"2025-04-08T20:39:56.618+00:00","status":405,"error":"Method Not Allowed","path":"/api/sales"}
+Failed to create sale: {"timestamp":"2025-04-08T20:39:56.631+00:00","status":405,"error":"Method Not Allowed","path":"/api/sales"}
+Failed to create sale: {"timestamp":"2025-04-08T20:39:56.644+00:00","status":405,"error":"Method Not Allowed","path":"/api/sales"}
+Failed to create sale: {"timestamp":"2025-04-08T20:39:56.660+00:00","status":405,"error":"Method Not Allowed","path":"/api/sales"}
+Failed to create sale: {"timestamp":"2025-04-08T20:39:56.672+00:00","status":405,"error":"Method Not Allowed","path":"/api/sales"}
+Failed to create sale: {"timestamp":"2025-04-08T20:39:56.685+00:00","status":405,"error":"Method Not Allowed","path":"/api/sales"}
+Failed to create sale: {"timestamp":"2025-04-08T20:39:56.697+00:00","status":405,"error":"Method Not Allowed","path":"/api/sales"}

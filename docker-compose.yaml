@@ -1,0 +1,57 @@
+services:
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: farmers_market_app
+    ports:
+      - "8080:8080"
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/farmers_market
+      SPRING_DATASOURCE_USERNAME: postgres
+      SPRING_DATASOURCE_PASSWORD: postgresmaster
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - farmers_market_network
+
+  postgres:
+    image: postgres:17
+    container_name: farmers_market_db
+    environment:
+      POSTGRES_DB: farmers_market
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgresmaster
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres && echo 'SELECT 1' | psql -U postgres -d farmers_market"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+    networks:
+      - farmers_market_network
+
+  pgadmin:
+    image: dpage/pgadmin4
+    container_name: pgadmin
+    environment:
+      PGADMIN_DEFAULT_EMAIL: admin@admin.com
+      PGADMIN_DEFAULT_PASSWORD: admin
+    ports:
+      - "5050:80"
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - farmers_market_network
+
+volumes:
+  postgres_data:
+
+networks:
+  farmers_market_network:
+    driver: bridge

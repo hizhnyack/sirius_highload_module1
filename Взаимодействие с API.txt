@@ -1,0 +1,14 @@
+curl -X POST http://localhost:8080/api/data/clear/all
+curl -X POST http://localhost:8080/api/data/clear/sales
+curl -X POST http://localhost:8080/api/data/clear/customers
+curl -X POST http://localhost:8080/api/data/clear/products
+
+В DataManagementController есть следующие эндпоинты:
+POST /api/data/clear/products - очистка всех продуктов
+POST /api/data/clear/customers - очистка всех клиентов
+POST /api/data/clear/sales - очистка всех продаж
+POST /api/data/clear/all - очистка всех данных сразу
+В отдельных контроллерах также есть эндпоинты для очистки:
+DELETE /api/products/clear - очистка продуктов
+DELETE /api/customers/clear - очистка клиентов
+DELETE /api/sales/clear - очистка продаж

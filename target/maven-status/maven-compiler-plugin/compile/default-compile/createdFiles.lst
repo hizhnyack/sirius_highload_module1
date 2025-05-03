@@ -1,0 +1,15 @@
+ru/hpclab/hl/module1/repository/ProductRepository.class
+ru/hpclab/hl/module1/repository/CustomerRepository.class
+ru/hpclab/hl/module1/repository/SaleRepository.class
+ru/hpclab/hl/module1/service/CustomerService.class
+ru/hpclab/hl/module1/controller/CustomerController.class
+ru/hpclab/hl/module1/model/Product.class
+ru/hpclab/hl/module1/model/Customer.class
+ru/hpclab/hl/module1/controller/ProductController.class
+ru/hpclab/hl/module1/Application.class
+ru/hpclab/hl/module1/model/Sale.class
+ru/hpclab/hl/module1/controller/DataManagementController.class
+ru/hpclab/hl/module1/service/SaleService.class
+ru/hpclab/hl/module1/controller/SaleController.class
+ru/hpclab/hl/module1/util/PythonScriptRunner.class
+ru/hpclab/hl/module1/service/ProductService.class

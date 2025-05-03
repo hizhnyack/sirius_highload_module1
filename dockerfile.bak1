@@ -1,0 +1,24 @@
+# Этап 1: Сборка приложения
+FROM gradle:8.6-jdk17 AS builder
+WORKDIR /app
+COPY build.gradle settings.gradle ./
+COPY src ./src
+RUN gradle build --no-daemon --warning-mode all && ls -l /app/build/libs/
+
+# Этап 2: Генерация данных
+FROM python:3.9-slim AS data-generator
+WORKDIR /app
+COPY generate_initdb.py .
+RUN mkdir -p src/main/resources
+RUN pip install faker && python generate_initdb.py
+RUN ls -l src/main/resources/  # Отладка: проверяем, что файл создан
+
+# Этап 3: Финальный образ
+FROM eclipse-temurin:17-jre-jammy
+WORKDIR /app
+
+COPY --from=builder build/libs/moule1-1.0.0.jar app.jar
+COPY --from=data-generator src/main/resources/initdb.sql /initdb.sql
+
+EXPOSE 8080
+ENTRYPOINT ["java", "-jar", "app.jar"]
