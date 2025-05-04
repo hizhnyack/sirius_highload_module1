@@ -48,8 +48,10 @@ public final class ObservabilityService {
             log.info("  No metrics recorded");
             return;
         }
-        double sum = 0.0;
-        int count = 0;
+        double totalDuration = 0.0;
+        long totalCount = 0;
+        long minMs = Long.MAX_VALUE;
+        long maxMs = Long.MIN_VALUE;
         for (Map.Entry<String, MetricStats> entry : metricsMap.entrySet()) {
             MetricStats stats = entry.getValue();
             if (stats.count > 0) {
@@ -59,12 +61,19 @@ public final class ObservabilityService {
                         String.format("%.5f", stats.avgMs / 1000.0),
                         String.format("%.5f", stats.minMs / 1000.0),
                         String.format("%.5f", stats.maxMs / 1000.0));
-                sum += stats.avgMs;
-                count++;
+                totalDuration += stats.avgMs * stats.count;
+                totalCount += stats.count;
+                if (stats.minMs < minMs) minMs = stats.minMs;
+                if (stats.maxMs > maxMs) maxMs = stats.maxMs;
             }
         }
-        if (count > 0) {
-            log.info("  [ALL] avg: {}s", String.format("%.5f", (sum / count) / 1000.0));
+        if (totalCount > 0) {
+            double avgMs = totalDuration / totalCount;
+            log.info("  [ALL] count: {}, avg: {}s, min: {}s, max: {}s",
+                    totalCount,
+                    String.format("%.5f", avgMs / 1000.0),
+                    String.format("%.5f", minMs / 1000.0),
+                    String.format("%.5f", maxMs / 1000.0));
         }
     }
 
