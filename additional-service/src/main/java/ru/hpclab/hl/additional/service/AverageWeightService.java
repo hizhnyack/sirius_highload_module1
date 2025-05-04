@@ -19,18 +19,31 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class AverageWeightService {
     private final SaleClient saleClient;
+    private final StatisticsCacheService statisticsCacheService;
 
     public List<AverageWeightResponse> calculateAverageWeightLastMonth() {
+        String cacheKey = "last-month";
+        if (statisticsCacheService.hasAverageWeight(cacheKey)) {
+            return statisticsCacheService.getAverageWeight(cacheKey);
+        }
         LocalDate endDate = LocalDate.now();
         LocalDate startDate = endDate.minusMonths(1);
-        return calculateAverageWeightForPeriod(startDate, endDate);
+        List<AverageWeightResponse> result = calculateAverageWeightForPeriod(startDate, endDate);
+        statisticsCacheService.putAverageWeight(cacheKey, result);
+        return result;
     }
 
     public List<AverageWeightResponse> calculateAverageWeightForMonth(int year, int month) {
+        String cacheKey = year + "-" + (month < 10 ? ("0" + month) : month);
+        if (statisticsCacheService.hasAverageWeight(cacheKey)) {
+            return statisticsCacheService.getAverageWeight(cacheKey);
+        }
         YearMonth yearMonth = YearMonth.of(year, month);
         LocalDate startDate = yearMonth.atDay(1);
         LocalDate endDate = yearMonth.atEndOfMonth();
-        return calculateAverageWeightForPeriod(startDate, endDate);
+        List<AverageWeightResponse> result = calculateAverageWeightForPeriod(startDate, endDate);
+        statisticsCacheService.putAverageWeight(cacheKey, result);
+        return result;
     }
 
     private List<AverageWeightResponse> calculateAverageWeightForPeriod(LocalDate startDate, LocalDate endDate) {
