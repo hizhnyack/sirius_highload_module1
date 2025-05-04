@@ -30,9 +30,6 @@ services:
           memory: 512M
     extra_hosts:
       - "host.docker.internal:host-gateway"
-    depends_on:
-      farmers-market-db:
-        condition: service_healthy
 
   additional-service:
     build:
@@ -49,40 +46,8 @@ services:
     networks:
       - farmers-market-network
 
-  farmers-market-db:
-    image: postgres:17
-    container_name: farmers-market-db
-    environment:
-      POSTGRES_DB: ${POSTGRES_DB}
-      POSTGRES_USER: ${POSTGRES_USER}
-      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
-    ports:
-      - "5432:5432"
-    volumes:
-      - postgres_data:/var/lib/postgresql/data
-    healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U postgres && echo 'SELECT 1' | psql -U postgres -d ${POSTGRES_DB}"]
-      interval: 5s
-      timeout: 5s
-      retries: 5
-    networks:
-      - farmers-market-network
 
-  pgadmin:
-    image: dpage/pgadmin4
-    container_name: pgadmin
-    environment:
-      PGADMIN_DEFAULT_EMAIL: ${PGADMIN_DEFAULT_EMAIL}
-      PGADMIN_DEFAULT_PASSWORD: ${PGADMIN_DEFAULT_PASSWORD}
-    ports:
-      - "5050:80"
-    depends_on:
-      farmers-market-db:
-        condition: service_healthy
-    volumes:
-      - pgadmin_data:/var/lib/pgadmin
-    networks:
-      - farmers-market-network
+ 
 
 volumes:
   postgres_data:
