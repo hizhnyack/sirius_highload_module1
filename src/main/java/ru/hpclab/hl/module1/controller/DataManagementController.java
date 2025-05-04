@@ -26,27 +26,47 @@ public class DataManagementController {
 
     @PostMapping("/clear/products")
     public ResponseEntity<String> clearProducts() {
-        productService.deleteAll();
-        return ResponseEntity.ok("All products have been deleted");
+        long start = System.currentTimeMillis();
+        try {
+            productService.deleteAll();
+            return ResponseEntity.ok("All products have been deleted");
+        } finally {
+            ru.hpclab.hl.module1.service.ObservabilityService.recordTiming("data.clearProducts", System.currentTimeMillis() - start);
+        }
     }
 
     @PostMapping("/clear/customers")
     public ResponseEntity<String> clearCustomers() {
-        customerService.deleteAll();
-        return ResponseEntity.ok("All customers have been deleted");
+        long start = System.currentTimeMillis();
+        try {
+            customerService.deleteAll();
+            return ResponseEntity.ok("All customers have been deleted");
+        } finally {
+            ru.hpclab.hl.module1.service.ObservabilityService.recordTiming("data.clearCustomers", System.currentTimeMillis() - start);
+        }
     }
 
     @PostMapping("/clear/sales")
     public ResponseEntity<String> clearSales() {
-        saleService.deleteAll();
-        return ResponseEntity.ok("All sales have been deleted");
+        long start = System.currentTimeMillis();
+        try {
+            saleService.deleteAll();
+            return ResponseEntity.ok("All sales have been deleted");
+        } finally {
+            ru.hpclab.hl.module1.service.ObservabilityService.recordTiming("data.clearSales", System.currentTimeMillis() - start);
+        }
     }
 
     @PostMapping("/clear/all")
     public ResponseEntity<String> clearAll() {
-        saleService.deleteAll();
-        productService.deleteAll();
-        customerService.deleteAll();
-        return ResponseEntity.ok("All data has been deleted");
+        long start = System.currentTimeMillis();
+        try {
+            saleService.deleteAll();
+            productService.deleteAll();
+            customerService.deleteAll();
+            return ResponseEntity.ok("All data has been deleted");
+        } finally {
+            ru.hpclab.hl.module1.service.ObservabilityService.recordTiming("data.clearAll", System.currentTimeMillis() - start);
+        }
     }
 } 

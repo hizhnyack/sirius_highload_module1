@@ -41,11 +41,16 @@ public class AverageWeightController {
     })
     @GetMapping("/last-month")
     public ResponseEntity<List<AverageWeightResponse>> getAverageWeightLastMonth() {
-        List<AverageWeightResponse> result = averageWeightService.calculateAverageWeightLastMonth(); // ✅ уточнён тип вместо var
-        if (result.isEmpty()) {
-            return ResponseEntity.noContent().build();
+        long start = System.currentTimeMillis();
+        try {
+            List<AverageWeightResponse> result = averageWeightService.calculateAverageWeightLastMonth();
+            if (result.isEmpty()) {
+                return ResponseEntity.noContent().build();
+            }
+            return ResponseEntity.ok(result);
+        } finally {
+            ru.hpclab.hl.additional.service.ObservabilityService.recordTiming("average-weight.last-month", System.currentTimeMillis() - start);
         }
-        return ResponseEntity.ok(result);
     }
 
     @Operation(
@@ -70,10 +75,15 @@ public class AverageWeightController {
     public ResponseEntity<List<AverageWeightResponse>> getAverageWeightForMonth(
             @RequestParam int year,
             @RequestParam int month) {
-        List<AverageWeightResponse> result = averageWeightService.calculateAverageWeightForMonth(year, month); // ✅ уточнён тип вместо var
-        if (result.isEmpty()) {
-            return ResponseEntity.noContent().build();
+        long start = System.currentTimeMillis();
+        try {
+            List<AverageWeightResponse> result = averageWeightService.calculateAverageWeightForMonth(year, month);
+            if (result.isEmpty()) {
+                return ResponseEntity.noContent().build();
+            }
+            return ResponseEntity.ok(result);
+        } finally {
+            ru.hpclab.hl.additional.service.ObservabilityService.recordTiming("average-weight.month", System.currentTimeMillis() - start);
         }
-        return ResponseEntity.ok(result);
     }
 }

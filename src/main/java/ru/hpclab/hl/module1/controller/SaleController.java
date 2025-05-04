@@ -24,46 +24,76 @@ public class SaleController {
 
     @PostMapping("/create")
     public Sale create(@RequestBody SaleCreateDto saleDto) {
-        return saleService.createSale(
-            saleDto.getProductId(),
-            saleDto.getCustomerId(),
-            saleDto.getWeight(),
-            saleDto.getDate()
-        );
+        long start = System.currentTimeMillis();
+        try {
+            return saleService.createSale(
+                saleDto.getProductId(),
+                saleDto.getCustomerId(),
+                saleDto.getWeight(),
+                saleDto.getDate()
+            );
+        } finally {
+            ru.hpclab.hl.module1.service.ObservabilityService.recordTiming("sale.create", System.currentTimeMillis() - start);
+        }
     }
 
     @GetMapping
     public List<Sale> findAll() {
-        return saleService.findAll();
+        long start = System.currentTimeMillis();
+        try {
+            return saleService.findAll();
+        } finally {
+            ru.hpclab.hl.module1.service.ObservabilityService.recordTiming("sale.findAll", System.currentTimeMillis() - start);
+        }
     }
 
     @GetMapping("/{id}")
     public ResponseEntity<Sale> findById(@PathVariable Long id) {
-        Optional<Sale> sale = saleService.findById(id);
-        return sale.map(ResponseEntity::ok)
-                .orElseGet(() -> ResponseEntity.notFound().build());
+        long start = System.currentTimeMillis();
+        try {
+            Optional<Sale> sale = saleService.findById(id);
+            return sale.map(ResponseEntity::ok)
+                    .orElseGet(() -> ResponseEntity.notFound().build());
+        } finally {
+            ru.hpclab.hl.module1.service.ObservabilityService.recordTiming("sale.findById", System.currentTimeMillis() - start);
+        }
     }
 
     @GetMapping("/by-date")
     public List<Sale> getSalesByDateRange(
             @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate startDate,
             @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate endDate) {
-        return saleService.findByDateBetween(startDate, endDate);
+        long start = System.currentTimeMillis();
+        try {
+            return saleService.findByDateBetween(startDate, endDate);
+        } finally {
+            ru.hpclab.hl.module1.service.ObservabilityService.recordTiming("sale.byDate", System.currentTimeMillis() - start);
+        }
     }
 
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> delete(@PathVariable Long id) {
-        Optional<Sale> sale = saleService.findById(id);
-        if (sale.isPresent()) {
-            saleService.deleteById(id);
-            return ResponseEntity.ok().build();
+        long start = System.currentTimeMillis();
+        try {
+            Optional<Sale> sale = saleService.findById(id);
+            if (sale.isPresent()) {
+                saleService.deleteById(id);
+                return ResponseEntity.ok().build();
+            }
+            return ResponseEntity.notFound().build();
+        } finally {
+            ru.hpclab.hl.module1.service.ObservabilityService.recordTiming("sale.delete", System.currentTimeMillis() - start);
         }
-        return ResponseEntity.notFound().build();
     }
 
     @DeleteMapping("/clear")
     public ResponseEntity<Void> deleteAll() {
-        saleService.deleteAll();
-        return ResponseEntity.ok().build();
+        long start = System.currentTimeMillis();
+        try {
+            saleService.deleteAll();
+            return ResponseEntity.ok().build();
+        } finally {
+            ru.hpclab.hl.module1.service.ObservabilityService.recordTiming("sale.deleteAll", System.currentTimeMillis() - start);
+        }
     }
 }
