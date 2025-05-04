@@ -35,31 +35,37 @@ public final class ObservabilityService {
         MetricsSnapshot snapshot = getMetricsAndClean();
         log.info("=== Metrics Report === {}", snapshot.timestamp);
         log.info("Last 10 seconds:");
-        logMetricsMap(snapshot.last10s);
+        logMetricsMapWithOverall(snapshot.last10s);
         log.info("Last 30 seconds:");
-        logMetricsMap(snapshot.last30s);
+        logMetricsMapWithOverall(snapshot.last30s);
         log.info("Last 1 minute:");
-        logMetricsMap(snapshot.last1m);
+        logMetricsMapWithOverall(snapshot.last1m);
         log.info("=== End Metrics Report ===");
     }
 
-    private void logMetricsMap(Map<String, MetricStats> metricsMap) {
+    private void logMetricsMapWithOverall(Map<String, MetricStats> metricsMap) {
         if (metricsMap.isEmpty()) {
             log.info("  No metrics recorded");
             return;
         }
-        metricsMap.entrySet().stream()
-            .filter(entry -> entry.getValue().count > 0)
-            .forEach(entry -> {
-                String name = entry.getKey();
-                MetricStats stats = entry.getValue();
+        double sum = 0.0;
+        int count = 0;
+        for (Map.Entry<String, MetricStats> entry : metricsMap.entrySet()) {
+            MetricStats stats = entry.getValue();
+            if (stats.count > 0) {
                 log.info("  {} - count: {}, avg: {}s, min: {}s, max: {}s",
-                        name,
+                        entry.getKey(),
                         stats.count,
                         String.format("%.5f", stats.avgMs / 1000.0),
                         String.format("%.5f", stats.minMs / 1000.0),
                         String.format("%.5f", stats.maxMs / 1000.0));
-            });
+                sum += stats.avgMs;
+                count++;
+            }
+        }
+        if (count > 0) {
+            log.info("  [ALL] avg: {}s", String.format("%.5f", (sum / count) / 1000.0));
+        }
     }
 
     private static Map<String, MetricStats> collectStats(long periodMs) {
