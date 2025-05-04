@@ -6,6 +6,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import ru.hpclab.hl.module1.model.Sale;
 import ru.hpclab.hl.module1.service.SaleService;
+import ru.hpclab.hl.module1.dto.SaleCreateDto;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -22,8 +23,13 @@ public class SaleController {
     }
 
     @PostMapping("/create")
-    public Sale create(@RequestBody Sale sale) {
-        return saleService.save(sale);
+    public Sale create(@RequestBody SaleCreateDto saleDto) {
+        return saleService.createSale(
+            saleDto.getProductId(),
+            saleDto.getCustomerId(),
+            saleDto.getWeight(),
+            saleDto.getDate()
+        );
     }
 
     @GetMapping
