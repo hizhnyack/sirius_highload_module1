@@ -47,7 +47,7 @@ public class StatisticsCacheService {
     }
 
     @Async
-    @Scheduled(fixedRateString = "${statistics.cache.print.rate:300000}")
+    @Scheduled(fixedRate = 120000)
     public void printCacheStatistics() {
         long start = System.currentTimeMillis();
         try {
