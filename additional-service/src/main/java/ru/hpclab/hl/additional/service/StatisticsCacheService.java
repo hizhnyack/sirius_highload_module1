@@ -20,30 +20,15 @@ public class StatisticsCacheService {
     private String infoString;
 
     public void putAverageWeight(String key, List<AverageWeightResponse> values) {
-        long start = System.currentTimeMillis();
-        try {
-            averageWeightCache.put(key, values);
-        } finally {
-            log.info("[CACHE] putAverageWeight: {} ms", System.currentTimeMillis() - start);
-        }
+        averageWeightCache.put(key, values);
     }
 
     public List<AverageWeightResponse> getAverageWeight(String key) {
-        long start = System.currentTimeMillis();
-        try {
-            return averageWeightCache.get(key);
-        } finally {
-            log.info("[CACHE] getAverageWeight: {} ms", System.currentTimeMillis() - start);
-        }
+        return averageWeightCache.get(key);
     }
 
     public boolean hasAverageWeight(String key) {
-        long start = System.currentTimeMillis();
-        try {
-            return averageWeightCache.containsKey(key);
-        } finally {
-            log.info("[CACHE] hasAverageWeight: {} ms", System.currentTimeMillis() - start);
-        }
+        return averageWeightCache.containsKey(key);
     }
 
     @Async
