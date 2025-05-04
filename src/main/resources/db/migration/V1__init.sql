@@ -20,5 +20,6 @@ CREATE TABLE IF NOT EXISTS sales (
     product_id BIGINT NOT NULL REFERENCES products(id),
     customer_id BIGINT NOT NULL REFERENCES customers(id),
     weight NUMERIC(8,2) NOT NULL,
-    date DATE NOT NULL
+    date DATE NOT NULL,
+    total_cost NUMERIC(12,2) NOT NULL
 );
