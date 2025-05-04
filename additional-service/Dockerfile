@@ -1,7 +1,7 @@
 FROM gradle:8.5-jdk17 AS build
 WORKDIR /app
 COPY . .
-RUN gradle build --no-daemon && ls -la /app/build/libs/
+RUN gradle clean build --no-daemon && ls -la /app/build/libs/
 
 FROM openjdk:17-slim
 WORKDIR /app

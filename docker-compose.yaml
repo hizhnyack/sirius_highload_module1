@@ -1,46 +1,67 @@
+version: '3.8'
+
 services:
   app:
     build:
       context: .
       dockerfile: Dockerfile
     container_name: farmers-market-app
+    environment:
+      DB_HOST: ${DB_HOST}
+      DB_PORT: ${DB_PORT}
+      POSTGRES_DB: ${POSTGRES_DB}
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      SPRING_DATASOURCE_URL: ${SPRING_DATASOURCE_URL}
+      SPRING_DATASOURCE_USERNAME: ${SPRING_DATASOURCE_USERNAME}
+      SPRING_DATASOURCE_PASSWORD: ${SPRING_DATASOURCE_PASSWORD}
+      SPRING_JPA_HIBERNATE_DDL_AUTO: ${SPRING_JPA_HIBERNATE_DDL_AUTO}
+      SERVER_TOMCAT_MAX_THREADS: ${TOMCAT_THREADS_MAX}
+      SERVER_TOMCAT_MIN_SPARE_THREADS: ${TOMCAT_THREADS_MIN_SPARE}
+      SPRING_JPA_SHOW_SQL: ${SPRING_JPA_SHOW_SQL}
     ports:
       - "8080:8080"
-    environment:
-      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/farmers_market
-      SPRING_DATASOURCE_USERNAME: postgres
-      SPRING_DATASOURCE_PASSWORD: postgresmaster
-    depends_on:
-      postgres:
-        condition: service_healthy
     networks:
       - farmers-market-network
+    deploy:
+      resources:
+        limits:
+          cpus: '1'
+          memory: 512M
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    depends_on:
+      farmers-market-db:
+        condition: service_healthy
 
   additional-service:
     build:
       context: ./additional-service
       dockerfile: Dockerfile
     container_name: farmers-market-additional
+    restart: always
     ports:
       - "8081:8081"
     environment:
       MAIN_SERVICE_URL: http://farmers-market-app:8080
+    mem_limit: 512m
+    cpus: 1
     networks:
       - farmers-market-network
 
-  postgres:
+  farmers-market-db:
     image: postgres:17
     container_name: farmers-market-db
     environment:
-      POSTGRES_DB: farmers_market
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: postgresmaster
+      POSTGRES_DB: ${POSTGRES_DB}
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
     ports:
       - "5432:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U postgres && echo 'SELECT 1' | psql -U postgres -d farmers_market"]
+      test: ["CMD-SHELL", "pg_isready -U postgres && echo 'SELECT 1' | psql -U postgres -d ${POSTGRES_DB}"]
       interval: 5s
       timeout: 5s
       retries: 5
@@ -51,18 +72,21 @@ services:
     image: dpage/pgadmin4
     container_name: pgadmin
     environment:
-      PGADMIN_DEFAULT_EMAIL: admin@admin.com
-      PGADMIN_DEFAULT_PASSWORD: admin
+      PGADMIN_DEFAULT_EMAIL: ${PGADMIN_DEFAULT_EMAIL}
+      PGADMIN_DEFAULT_PASSWORD: ${PGADMIN_DEFAULT_PASSWORD}
     ports:
       - "5050:80"
     depends_on:
-      postgres:
+      farmers-market-db:
         condition: service_healthy
+    volumes:
+      - pgadmin_data:/var/lib/pgadmin
     networks:
       - farmers-market-network
 
 volumes:
   postgres_data:
+  pgadmin_data:
 
 networks:
   farmers-market-network:

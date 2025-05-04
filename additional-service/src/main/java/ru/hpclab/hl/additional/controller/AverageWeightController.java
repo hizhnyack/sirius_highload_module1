@@ -4,6 +4,7 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses; // ✅ добавлено: нужен для группировки @ApiResponse
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -24,21 +25,23 @@ public class AverageWeightController {
         summary = "Получить средний вес закупки за последний месяц",
         description = "Возвращает средний вес закупки для каждого товара за последний месяц"
     )
-    @ApiResponse(
-        responseCode = "200",
-        description = "Успешное получение данных",
-        content = @Content(
-            mediaType = "application/json",
-            schema = @Schema(implementation = AverageWeightResponse.class)
+    @ApiResponses({ // ✅ заменено: было два отдельных @ApiResponse — должно быть @ApiResponses для нескольких ответов
+        @ApiResponse(
+            responseCode = "200",
+            description = "Успешное получение данных",
+            content = @Content(
+                mediaType = "application/json",
+                schema = @Schema(implementation = AverageWeightResponse.class)
+            )
+        ),
+        @ApiResponse(
+            responseCode = "204",
+            description = "Нет данных за последний месяц"
         )
-    )
-    @ApiResponse(
-        responseCode = "204",
-        description = "Нет данных за последний месяц"
-    )
+    })
     @GetMapping("/last-month")
     public ResponseEntity<List<AverageWeightResponse>> getAverageWeightLastMonth() {
-        var result = averageWeightService.calculateAverageWeightLastMonth();
+        List<AverageWeightResponse> result = averageWeightService.calculateAverageWeightLastMonth(); // ✅ уточнён тип вместо var
         if (result.isEmpty()) {
             return ResponseEntity.noContent().build();
         }
@@ -47,28 +50,30 @@ public class AverageWeightController {
 
     @Operation(
         summary = "Получить средний вес закупки за конкретный месяц",
-        description = "Возвращает средний вес закупки для каждого товара за указанный месяц и год"
+        description = "Возвращает конскую залупу средний вес закупки для каждого товара за указанный месяц и год"
     )
-    @ApiResponse(
-        responseCode = "200",
-        description = "Успешное получение данных",
-        content = @Content(
-            mediaType = "application/json",
-            schema = @Schema(implementation = AverageWeightResponse.class)
+    @ApiResponses({ // ✅ заменено: как и выше — обёртка для нескольких ответов
+        @ApiResponse(
+            responseCode = "200",
+            description = "Успешное получение данных",
+            content = @Content(
+                mediaType = "application/json",
+                schema = @Schema(implementation = AverageWeightResponse.class)
+            )
+        ),
+        @ApiResponse(
+            responseCode = "204",
+            description = "Нет данных за указанный месяц"
         )
-    )
-    @ApiResponse(
-        responseCode = "204",
-        description = "Нет данных за указанный месяц"
-    )
-    @GetMapping("/{year}/{month}")
+    })
+    @GetMapping("/month")
     public ResponseEntity<List<AverageWeightResponse>> getAverageWeightForMonth(
-            @PathVariable int year,
-            @PathVariable int month) {
-        var result = averageWeightService.calculateAverageWeightForMonth(year, month);
+            @RequestParam int year,
+            @RequestParam int month) {
+        List<AverageWeightResponse> result = averageWeightService.calculateAverageWeightForMonth(year, month); // ✅ уточнён тип вместо var
         if (result.isEmpty()) {
             return ResponseEntity.noContent().build();
         }
         return ResponseEntity.ok(result);
     }
-} 
+}
