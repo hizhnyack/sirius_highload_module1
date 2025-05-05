@@ -7,11 +7,12 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestParam;
 import ru.hpclab.hl.additional.dto.ProductDTO;
 import ru.hpclab.hl.additional.dto.SaleDTO;
+import ru.hpclab.hl.additional.fallback.SaleClientFallback;
 
 import java.time.LocalDate;
 import java.util.List;
 
-@FeignClient(name = "main-service", url = "${main.service.url}")
+@FeignClient(name = "main-service", url = "${main.service.url}", fallback = SaleClientFallback.class)
 public interface SaleClient {
     @GetMapping("/api/sales")
     List<SaleDTO> getSalesByDateRange(
