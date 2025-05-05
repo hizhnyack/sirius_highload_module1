@@ -29,12 +29,12 @@ public class SaleController {
     public Sale create(@RequestBody SaleCreateDto saleDto) {
         long start = System.currentTimeMillis();
         try {
-            return saleService.createSale(
-                saleDto.getProductId(),
-                saleDto.getCustomerId(),
-                saleDto.getWeight(),
-                saleDto.getDate()
-            );
+        return saleService.createSale(
+            saleDto.getProductId(),
+            saleDto.getCustomerId(),
+            saleDto.getWeight(),
+            saleDto.getDate()
+        );
         } finally {
             observabilityService.recordTiming("sale.create", System.currentTimeMillis() - start);
         }
@@ -44,7 +44,7 @@ public class SaleController {
     public List<Sale> findAll() {
         long start = System.currentTimeMillis();
         try {
-            return saleService.findAll();
+        return saleService.findAll();
         } finally {
             observabilityService.recordTiming("sale.findAll", System.currentTimeMillis() - start);
         }
@@ -54,9 +54,9 @@ public class SaleController {
     public ResponseEntity<Sale> findById(@PathVariable Long id) {
         long start = System.currentTimeMillis();
         try {
-            Optional<Sale> sale = saleService.findById(id);
-            return sale.map(ResponseEntity::ok)
-                    .orElseGet(() -> ResponseEntity.notFound().build());
+        Optional<Sale> sale = saleService.findById(id);
+        return sale.map(ResponseEntity::ok)
+                .orElseGet(() -> ResponseEntity.notFound().build());
         } finally {
             observabilityService.recordTiming("sale.findById", System.currentTimeMillis() - start);
         }
@@ -68,7 +68,7 @@ public class SaleController {
             @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate endDate) {
         long start = System.currentTimeMillis();
         try {
-            return saleService.findByDateBetween(startDate, endDate);
+        return saleService.findByDateBetween(startDate, endDate);
         } finally {
             observabilityService.recordTiming("sale.byDate", System.currentTimeMillis() - start);
         }
@@ -78,12 +78,12 @@ public class SaleController {
     public ResponseEntity<Void> delete(@PathVariable Long id) {
         long start = System.currentTimeMillis();
         try {
-            Optional<Sale> sale = saleService.findById(id);
-            if (sale.isPresent()) {
-                saleService.deleteById(id);
-                return ResponseEntity.ok().build();
-            }
-            return ResponseEntity.notFound().build();
+        Optional<Sale> sale = saleService.findById(id);
+        if (sale.isPresent()) {
+            saleService.deleteById(id);
+            return ResponseEntity.ok().build();
+        }
+        return ResponseEntity.notFound().build();
         } finally {
             observabilityService.recordTiming("sale.delete", System.currentTimeMillis() - start);
         }
@@ -93,8 +93,8 @@ public class SaleController {
     public ResponseEntity<Void> deleteAll() {
         long start = System.currentTimeMillis();
         try {
-            saleService.deleteAll();
-            return ResponseEntity.ok().build();
+        saleService.deleteAll();
+        return ResponseEntity.ok().build();
         } finally {
             observabilityService.recordTiming("sale.deleteAll", System.currentTimeMillis() - start);
         }

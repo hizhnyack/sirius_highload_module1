@@ -45,10 +45,10 @@ public class AverageWeightController {
         long start = System.currentTimeMillis();
         try {
             List<AverageWeightResponse> result = averageWeightService.calculateAverageWeightLastMonth();
-            if (result.isEmpty()) {
-                return ResponseEntity.noContent().build();
-            }
-            return ResponseEntity.ok(result);
+        if (result.isEmpty()) {
+            return ResponseEntity.noContent().build();
+        }
+        return ResponseEntity.ok(result);
         } finally {
             ObservabilityService.recordTiming("average-weight.last-month", System.currentTimeMillis() - start);
         }
@@ -79,10 +79,10 @@ public class AverageWeightController {
         long start = System.currentTimeMillis();
         try {
             List<AverageWeightResponse> result = averageWeightService.calculateAverageWeightForMonth(year, month);
-            if (result.isEmpty()) {
-                return ResponseEntity.noContent().build();
-            }
-            return ResponseEntity.ok(result);
+        if (result.isEmpty()) {
+            return ResponseEntity.noContent().build();
+        }
+        return ResponseEntity.ok(result);
         } finally {
             ObservabilityService.recordTiming("average-weight.month", System.currentTimeMillis() - start);
         }

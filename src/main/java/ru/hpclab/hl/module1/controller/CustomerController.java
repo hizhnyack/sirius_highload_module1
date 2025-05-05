@@ -24,7 +24,7 @@ public class CustomerController {
     public List<Customer> findAll() {
         long start = System.currentTimeMillis();
         try {
-            return customerService.findAll();
+        return customerService.findAll();
         } finally {
             ObservabilityService.recordTiming("customer.findAll", System.currentTimeMillis() - start);
         }
@@ -34,9 +34,9 @@ public class CustomerController {
     public ResponseEntity<Customer> findById(@PathVariable Long id) {
         long start = System.currentTimeMillis();
         try {
-            Optional<Customer> customer = customerService.findById(id);
-            return customer.map(ResponseEntity::ok)
-                    .orElseGet(() -> ResponseEntity.notFound().build());
+        Optional<Customer> customer = customerService.findById(id);
+        return customer.map(ResponseEntity::ok)
+                .orElseGet(() -> ResponseEntity.notFound().build());
         } finally {
             ObservabilityService.recordTiming("customer.findById", System.currentTimeMillis() - start);
         }
@@ -46,7 +46,7 @@ public class CustomerController {
     public Customer create(@RequestBody Customer customer) {
         long start = System.currentTimeMillis();
         try {
-            return customerService.save(customer);
+        return customerService.save(customer);
         } finally {
             ObservabilityService.recordTiming("customer.create", System.currentTimeMillis() - start);
         }
@@ -56,12 +56,12 @@ public class CustomerController {
     public ResponseEntity<Void> delete(@PathVariable Long id) {
         long start = System.currentTimeMillis();
         try {
-            Optional<Customer> customer = customerService.findById(id);
-            if (customer.isPresent()) {
-                customerService.deleteById(id);
-                return ResponseEntity.ok().build();
-            }
-            return ResponseEntity.notFound().build();
+        Optional<Customer> customer = customerService.findById(id);
+        if (customer.isPresent()) {
+            customerService.deleteById(id);
+            return ResponseEntity.ok().build();
+        }
+        return ResponseEntity.notFound().build();
         } finally {
             ObservabilityService.recordTiming("customer.delete", System.currentTimeMillis() - start);
         }
@@ -71,8 +71,8 @@ public class CustomerController {
     public ResponseEntity<Void> deleteAll() {
         long start = System.currentTimeMillis();
         try {
-            customerService.deleteAll();
-            return ResponseEntity.ok().build();
+        customerService.deleteAll();
+        return ResponseEntity.ok().build();
         } finally {
             ObservabilityService.recordTiming("customer.deleteAll", System.currentTimeMillis() - start);
         }
