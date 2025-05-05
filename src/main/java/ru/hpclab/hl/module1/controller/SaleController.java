@@ -41,12 +41,18 @@ public class SaleController {
     }
 
     @GetMapping
-    public List<Sale> findAll() {
+    public List<Sale> getSales(
+            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate startDate,
+            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate endDate) {
         long start = System.currentTimeMillis();
         try {
-        return saleService.findAll();
+            if (startDate != null && endDate != null) {
+                return saleService.findByDateBetween(startDate, endDate);
+            } else {
+                return saleService.findAll();
+            }
         } finally {
-            observabilityService.recordTiming("sale.findAll", System.currentTimeMillis() - start);
+            observabilityService.recordTiming("sale.byDate", System.currentTimeMillis() - start);
         }
     }
 
