@@ -1,24 +1,39 @@
 version: '3.8'
 
 services:
+  db:
+    image: postgres:15
+    container_name: farmers-market-db
+    restart: always
+    environment:
+      POSTGRES_DB: farmers_market
+      POSTGRES_USER: fm_user
+      POSTGRES_PASSWORD: fm_password
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - farmers-market-network
+
   app:
     build:
       context: .
       dockerfile: Dockerfile
     container_name: farmers-market-app
     environment:
-      DB_HOST: ${DB_HOST}
-      DB_PORT: ${DB_PORT}
-      POSTGRES_DB: ${POSTGRES_DB}
-      POSTGRES_USER: ${POSTGRES_USER}
-      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
-      SPRING_DATASOURCE_URL: ${SPRING_DATASOURCE_URL}
-      SPRING_DATASOURCE_USERNAME: ${SPRING_DATASOURCE_USERNAME}
-      SPRING_DATASOURCE_PASSWORD: ${SPRING_DATASOURCE_PASSWORD}
-      SPRING_JPA_HIBERNATE_DDL_AUTO: ${SPRING_JPA_HIBERNATE_DDL_AUTO}
-      SERVER_TOMCAT_MAX_THREADS: ${TOMCAT_THREADS_MAX}
-      SERVER_TOMCAT_MIN_SPARE_THREADS: ${TOMCAT_THREADS_MIN_SPARE}
-      SPRING_JPA_SHOW_SQL: ${SPRING_JPA_SHOW_SQL}
+      DB_HOST: db
+      DB_PORT: 5432
+      POSTGRES_DB: farmers_market
+      POSTGRES_USER: fm_user
+      POSTGRES_PASSWORD: fm_password
+      SPRING_DATASOURCE_URL: jdbc:postgresql://db:5432/farmers_market
+      SPRING_DATASOURCE_USERNAME: fm_user
+      SPRING_DATASOURCE_PASSWORD: fm_password
+      SPRING_JPA_HIBERNATE_DDL_AUTO: update
+      SERVER_TOMCAT_MAX_THREADS: 200
+      SERVER_TOMCAT_MIN_SPARE_THREADS: 10
+      SPRING_JPA_SHOW_SQL: "true"
     ports:
       - "8080:8080"
     networks:
@@ -45,9 +60,6 @@ services:
     cpus: 1
     networks:
       - farmers-market-network
-
-
- 
 
 volumes:
   postgres_data:
