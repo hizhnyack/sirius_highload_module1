@@ -20,28 +20,22 @@ public class StatisticsCacheService {
     private String infoString;
 
     public void putAverageWeight(String key, List<AverageWeightResponse> values) {
-        averageWeightCache.put(key, values);
+        // Кэширование отключено
     }
 
     public List<AverageWeightResponse> getAverageWeight(String key) {
-        return averageWeightCache.get(key);
+        // Кэширование отключено
+        return java.util.Collections.emptyList();
     }
 
     public boolean hasAverageWeight(String key) {
-        return averageWeightCache.containsKey(key);
+        // Кэширование отключено
+        return false;
     }
 
-    @Async
-    @Scheduled(fixedRate = 120000)
+    //@Async
+    //@Scheduled(fixedRate = 120000)
     public void printCacheStatistics() {
-        long start = System.currentTimeMillis();
-        try {
-            log.info("{} - Time: {} - AverageWeight Cache Entries: {}", 
-                infoString,
-                java.time.LocalDateTime.now(),
-                averageWeightCache.size());
-        } finally {
-            log.info("[CACHE] printStatistics: {} ms", System.currentTimeMillis() - start);
-        }
+        // Кэширование отключено
     }
 } 
