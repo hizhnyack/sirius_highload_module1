@@ -8,6 +8,11 @@ import org.springframework.stereotype.Component;
 import ru.hpclab.hl.additional.dto.SaleDTO;
 import ru.hpclab.hl.additional.dto.ProductDTO;
 import ru.hpclab.hl.additional.dto.CustomerDTO;
+import org.springframework.beans.factory.annotation.Autowired;
+import ru.hpclab.hl.additional.client.SaleClient;
+import java.time.LocalDate;
+import java.util.HashSet;
+import java.util.Set;
 
 import java.util.List;
 import java.util.Map;
@@ -22,6 +27,13 @@ public class StatisticsCacheService {
     private final Map<Long, ProductDTO> productCache = new ConcurrentHashMap<>();
     // Кэш покупателей: ключ — customerId, значение — CustomerDTO
     private final Map<Long, CustomerDTO> customerCache = new ConcurrentHashMap<>();
+
+    private final SaleClient saleClient;
+
+    @Autowired
+    public StatisticsCacheService(SaleClient saleClient) {
+        this.saleClient = saleClient;
+    }
 
     @Value("${statistics.cache.info:Cache Statistics}")
     private String infoString;
@@ -85,6 +97,40 @@ public class StatisticsCacheService {
                 customerCache.size());
         } finally {
             log.info("[CACHE] printStatistics: {} ms", System.currentTimeMillis() - start);
+        }
+    }
+
+    /**
+     * Автоматически наполняет кэши продаж, товаров и покупателей за последний месяц
+     */
+    @Async
+    @Scheduled(fixedRateString = "${statistics.cache.fill.fixedRate:60000}")
+    public void fillCaches() {
+        try {
+            LocalDate endDate = LocalDate.now();
+            LocalDate startDate = endDate.minusMonths(1);
+            String periodKey = String.format("%d-%02d", startDate.getYear(), startDate.getMonthValue());
+            List<SaleDTO> sales = saleClient.getSalesByDateRange(startDate, endDate);
+            if (sales != null && !sales.isEmpty()) {
+                putSales(periodKey, sales);
+                Set<Long> productIds = new HashSet<>();
+                Set<Long> customerIds = new HashSet<>();
+                for (SaleDTO sale : sales) {
+                    if (sale.getProduct() != null && sale.getProduct().getId() != null) {
+                        productIds.add(sale.getProduct().getId());
+                        putProduct(sale.getProduct());
+                    }
+                    if (sale.getCustomer() != null && sale.getCustomer().getId() != null) {
+                        customerIds.add(sale.getCustomer().getId());
+                        putCustomer(sale.getCustomer());
+                    }
+                }
+                log.info("[CACHE FILL] Loaded {} sales, {} products, {} customers for period {}", sales.size(), productIds.size(), customerIds.size(), periodKey);
+            } else {
+                log.warn("[CACHE FILL] No sales loaded for period {}", periodKey);
+            }
+        } catch (Exception e) {
+            log.error("[CACHE FILL] Error filling caches: {}", e.getMessage(), e);
         }
     }
 } 
