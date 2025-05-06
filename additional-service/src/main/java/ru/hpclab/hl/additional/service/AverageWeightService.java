@@ -10,6 +10,7 @@ import ru.hpclab.hl.additional.dto.SaleDTO;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.scheduling.annotation.Scheduled;
+import ru.hpclab.hl.additional.client.SaleClient;
 
 import java.time.LocalDate;
 import java.time.YearMonth;
@@ -26,6 +27,7 @@ public class AverageWeightService {
     private static final Logger logger = LoggerFactory.getLogger(AverageWeightService.class);
 
     private final StatisticsCacheService statisticsCacheService;
+    private final SaleClient saleClient;
 
     @Value("${averageweightservice.infostring:AverageWeightService}")
     private String infoString;
@@ -55,9 +57,21 @@ public class AverageWeightService {
 
     private List<AverageWeightResponse> calculateAverageWeightForPeriod(LocalDate startDate, LocalDate endDate) {
         String cacheKey = getPeriodKey(startDate, endDate);
-        List<SaleDTO> sales = statisticsCacheService.getSales(cacheKey);
-        if (sales == null || sales.isEmpty()) {
-            logger.info("No sales found in cache for period {} to {}", startDate, endDate);
+        // ВСЕГДА получаем актуальные продажи из main-service
+        List<SaleDTO> sales = saleClient.getSalesByDateRange(startDate, endDate);
+        if (sales != null && !sales.isEmpty()) {
+            statisticsCacheService.putSales(cacheKey, sales);
+            // Положить в кэш товары и покупателей
+            for (SaleDTO sale : sales) {
+                if (sale.getProduct() != null && sale.getProduct().getId() != null) {
+                    statisticsCacheService.putProduct(sale.getProduct());
+                }
+                if (sale.getCustomer() != null && sale.getCustomer().getId() != null) {
+                    statisticsCacheService.putCustomer(sale.getCustomer());
+                }
+            }
+        } else {
+            logger.info("No sales found for period {} to {} (main-service)", startDate, endDate);
             return new ArrayList<>();
         }
 
