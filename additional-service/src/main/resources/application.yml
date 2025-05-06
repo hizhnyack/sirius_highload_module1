@@ -21,4 +21,16 @@ feign:
 
 main:
   service:
-    url: http://farmers-market-app:8080 
+    url: http://farmers-market-app:8080
+
+# Настройки кэша
+statistics:
+  cache:
+    fill:
+      fixedRate: 30000  # Обновление кэша каждые 30 секунд
+    retention:
+      period: 3  # Хранить данные за последние 3 месяца
+    max:
+      sales: 1000  # Максимальное количество продаж в кэше
+      products: 500  # Максимальное количество продуктов в кэше
+      customers: 500  # Максимальное количество покупателей в кэше 
