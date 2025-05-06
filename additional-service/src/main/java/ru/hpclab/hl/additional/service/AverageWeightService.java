@@ -35,11 +35,7 @@ public class AverageWeightService {
     @Async
     @Scheduled(fixedRateString = "${averageweightservice.fixedRate.in.milliseconds:60000}")
     public void printCacheStatistics() {
-        int salesSize = statisticsCacheService.getSalesCacheSize();
-        int productSize = statisticsCacheService.getProductCacheSize();
-        int customerSize = statisticsCacheService.getCustomerCacheSize();
-        logger.info("[{}] Cache sizes: salesCache={}, productCache={}, customerCache={}",
-                infoString, salesSize, productSize, customerSize);
+        logger.info("[{}] Cache is disabled - all sizes are 0", infoString);
     }
 
     public List<AverageWeightResponse> calculateAverageWeightLastMonth() {
@@ -56,21 +52,8 @@ public class AverageWeightService {
     }
 
     private List<AverageWeightResponse> calculateAverageWeightForPeriod(LocalDate startDate, LocalDate endDate) {
-        String cacheKey = getPeriodKey(startDate, endDate);
-        // ВСЕГДА получаем актуальные продажи из main-service
         List<SaleDTO> sales = saleClient.getSalesByDateRange(startDate, endDate);
-        if (sales != null && !sales.isEmpty()) {
-            statisticsCacheService.putSales(cacheKey, sales);
-            // Положить в кэш товары и покупателей
-            for (SaleDTO sale : sales) {
-                if (sale.getProduct() != null && sale.getProduct().getId() != null) {
-                    statisticsCacheService.putProduct(sale.getProduct());
-                }
-                if (sale.getCustomer() != null && sale.getCustomer().getId() != null) {
-                    statisticsCacheService.putCustomer(sale.getCustomer());
-                }
-            }
-        } else {
+        if (sales == null || sales.isEmpty()) {
             logger.info("No sales found for period {} to {} (main-service)", startDate, endDate);
             return new ArrayList<>();
         }
@@ -87,7 +70,7 @@ public class AverageWeightService {
                 .map(entry -> {
                     Long productId = entry.getKey();
                     List<SaleDTO> productSales = entry.getValue();
-                    String productName = getProductNameFromCache(productId);
+                    String productName = getProductName(productId, productSales);
                     double averageWeight = productSales.stream()
                             .mapToDouble(SaleDTO::getWeight)
                             .average()
@@ -97,15 +80,16 @@ public class AverageWeightService {
                 .collect(Collectors.toList());
     }
 
-    private String getProductNameFromCache(Long productId) {
-        ProductDTO product = statisticsCacheService.getProduct(productId);
-        return Optional.ofNullable(product)
-                .map(ProductDTO::getName)
+    private String getProductName(Long productId, List<SaleDTO> sales) {
+        return sales.stream()
+                .filter(sale -> sale.getProduct() != null && sale.getProduct().getId().equals(productId))
+                .findFirst()
+                .map(sale -> Optional.ofNullable(sale.getProduct().getName())
+                        .orElse("Товар #" + productId))
                 .orElse("Товар #" + productId);
     }
 
     private String getPeriodKey(LocalDate startDate, LocalDate endDate) {
-        // Например, "2024-05" для месяца или "2024-04-01_2024-04-30" для произвольного периода
         if (startDate.getDayOfMonth() == 1 && endDate.equals(startDate.withDayOfMonth(startDate.lengthOfMonth()))) {
             return String.format("%d-%02d", startDate.getYear(), startDate.getMonthValue());
         } else {
