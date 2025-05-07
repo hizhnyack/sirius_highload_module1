@@ -4,7 +4,7 @@ import time
 
 # Конфигурация
 KAFKA_SERVERS = ['hl22.zil:9094', 'hl23.zil:9094']
-TOPIC = 'hizhnyak'
+TOPIC = 'hizhnyaсk'
 
 # Создаем продюсер
 producer = KafkaProducer(
