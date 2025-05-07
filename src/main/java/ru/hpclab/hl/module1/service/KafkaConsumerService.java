@@ -14,6 +14,7 @@ import ru.hpclab.hl.module1.repository.ProductRepository;
 import ru.hpclab.hl.module1.repository.SaleRepository;
 
 import java.util.Map;
+import java.util.Optional;
 
 @Slf4j
 @Service
@@ -89,13 +90,32 @@ public class KafkaConsumerService {
 
     private void saveSale(Map<String, Object> data) {
         try {
-            Sale sale = new Sale();
-            sale.setProductId(((Number) data.get("productId")).longValue());
-            sale.setCustomerId(((Number) data.get("customerId")).longValue());
-            sale.setWeight(((Number) data.get("weight")).doubleValue());
-            sale.setDate(java.time.LocalDate.parse((String) data.get("date")));
-            saleRepository.save(sale);
-            log.info("Saved sale: productId={}, customerId={}", sale.getProductId(), sale.getCustomerId());
+            Long productId = ((Number) data.get("productId")).longValue();
+            Long customerId = ((Number) data.get("customerId")).longValue();
+            
+            Optional<Product> productOpt = productRepository.findById(productId);
+            Optional<Customer> customerOpt = customerRepository.findById(customerId);
+            
+            if (productOpt.isPresent() && customerOpt.isPresent()) {
+                Sale sale = new Sale();
+                sale.setProduct(productOpt.get());
+                sale.setCustomer(customerOpt.get());
+                sale.setWeight(((Number) data.get("weight")).doubleValue());
+                sale.setDate(java.time.LocalDate.parse((String) data.get("date")));
+                
+                // Рассчитываем общую стоимость
+                double totalCost = sale.getWeight() * productOpt.get().getPricePerKg();
+                sale.setTotalCost(totalCost);
+                
+                saleRepository.save(sale);
+                log.info("Saved sale: product={}, customer={}, totalCost={}", 
+                    productOpt.get().getName(), 
+                    customerOpt.get().getFullName(),
+                    totalCost);
+            } else {
+                log.error("Product or Customer not found for sale: productId={}, customerId={}", 
+                    productId, customerId);
+            }
         } catch (Exception e) {
             log.error("Error saving sale: {}", data, e);
         }
