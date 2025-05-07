@@ -18,7 +18,7 @@ fake = Faker('ru_RU')
 
 # Конфигурация Kafka
 KAFKA_SERVERS = ['hl22.zil:9094', 'hl23.zil:9094']
-TOPIC = 'hizhnyak'  # Проверьте, что топик называется именно так
+TOPIC = 'hizhnyack'  # Исправлено название топика
 
 # Словари для генерации данных
 CATEGORIES = {
@@ -59,7 +59,10 @@ def create_producer():
             acks='all',  # Ждем подтверждения от всех реплик
             retries=3,   # Количество попыток отправки
             request_timeout_ms=30000,  # Таймаут запроса
-            api_version_auto_timeout_ms=30000  # Таймаут для определения версии API
+            api_version_auto_timeout_ms=30000,  # Таймаут для определения версии API
+            security_protocol='PLAINTEXT',  # Протокол безопасности
+            client_id='python-producer',  # Идентификатор клиента
+            max_block_ms=60000  # Максимальное время блокировки
         )
         logger.info(f"Producer created successfully, connected to {KAFKA_SERVERS}")
         return producer
