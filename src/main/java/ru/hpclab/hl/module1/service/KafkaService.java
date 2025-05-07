@@ -11,6 +11,12 @@ import org.springframework.kafka.support.SendResult;
 import org.springframework.stereotype.Service;
 import org.springframework.util.concurrent.ListenableFuture;
 import org.springframework.util.concurrent.ListenableFutureCallback;
+import ru.hpclab.hl.module1.model.Product;
+import ru.hpclab.hl.module1.model.Customer;
+import ru.hpclab.hl.module1.model.Sale;
+import ru.hpclab.hl.module1.repository.ProductRepository;
+import ru.hpclab.hl.module1.repository.CustomerRepository;
+import ru.hpclab.hl.module1.repository.SaleRepository;
 
 import java.time.Instant;
 import java.time.LocalDateTime;
@@ -24,6 +30,9 @@ public class KafkaService {
 
     private final KafkaTemplate<String, String> kafkaTemplate;
     private final ObjectMapper objectMapper;
+    private final ProductRepository productRepository;
+    private final CustomerRepository customerRepository;
+    private final SaleRepository saleRepository;
 
     @Value("${kafka.topic}")
     private String topic;
@@ -49,31 +58,58 @@ public class KafkaService {
         try {
             // Парсим JSON сообщение
             Map<String, Object> messageMap = objectMapper.readValue(message, Map.class);
-            
-            // Извлекаем данные
-            Long id = ((Number) messageMap.get("id")).longValue();
-            String messageText = (String) messageMap.get("message");
-            Long timestamp = ((Number) messageMap.get("timestamp")).longValue();
-            
-            // Конвертируем timestamp в читаемую дату
-            LocalDateTime dateTime = LocalDateTime.ofInstant(
-                Instant.ofEpochSecond(timestamp), 
-                ZoneId.systemDefault()
-            );
+            String type = (String) messageMap.get("type");
+            Map<String, Object> data = (Map<String, Object>) messageMap.get("data");
 
-            // Логируем полученное сообщение
-            log.info("Received message: id={}, message={}, timestamp={}", 
-                    id, messageText, dateTime);
+            log.info("Received message: {}", message);
 
-            // Здесь можно добавить вашу бизнес-логику
-            // Например, сохранить в базу данных, отправить уведомление и т.д.
+            switch (type) {
+                case "product":
+                    handleProduct(data);
+                    break;
+                case "customer":
+                    handleCustomer(data);
+                    break;
+                case "sale":
+                    handleSale(data);
+                    break;
+                default:
+                    log.warn("Unknown message type: {}", type);
+            }
 
             // Подтверждаем обработку сообщения
             ack.acknowledge();
             
         } catch (Exception e) {
             log.error("Error processing message: {}", message, e);
-            // В случае ошибки можно реализовать retry логику или отправить в dead letter queue
         }
+    }
+
+    private void handleProduct(Map<String, Object> data) {
+        Product product = new Product();
+        product.setName((String) data.get("name"));
+        product.setCategory((String) data.get("category"));
+        product.setPricePerKg(((Number) data.get("pricePerKg")).doubleValue());
+        productRepository.save(product);
+        log.info("Saved product: {}", product.getName());
+    }
+
+    private void handleCustomer(Map<String, Object> data) {
+        Customer customer = new Customer();
+        customer.setFullName((String) data.get("fullName"));
+        customer.setPhone((String) data.get("phone"));
+        customer.setHasDiscountCard((Boolean) data.get("hasDiscountCard"));
+        customerRepository.save(customer);
+        log.info("Saved customer: {}", customer.getFullName());
+    }
+
+    private void handleSale(Map<String, Object> data) {
+        Sale sale = new Sale();
+        sale.setProductId(((Number) data.get("productId")).longValue());
+        sale.setCustomerId(((Number) data.get("customerId")).longValue());
+        sale.setWeight(((Number) data.get("weight")).doubleValue());
+        sale.setDate(LocalDateTime.parse((String) data.get("date")));
+        saleRepository.save(sale);
+        log.info("Saved sale: productId={}, customerId={}", sale.getProductId(), sale.getCustomerId());
     }
 } 

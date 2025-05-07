@@ -1,6 +1,6 @@
 package ru.hpclab.hl.module1.model;
 
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.Objects;
 import javax.persistence.*;
 import lombok.Data;
@@ -13,33 +13,27 @@ public class Sale {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @ManyToOne
-    @JoinColumn(name = "product_id", nullable = false)
-    private Product product;
+    @Column(name = "product_id", nullable = false)
+    private Long productId;
 
-    @ManyToOne
-    @JoinColumn(name = "customer_id", nullable = false)
-    private Customer customer;
+    @Column(name = "customer_id", nullable = false)
+    private Long customerId;
 
     @Column(nullable = false)
-    private LocalDate date;
+    private Double weight;
 
     @Column(nullable = false)
-    private double weight;
-
-    @Column(nullable = false)
-    private double totalCost;
+    private LocalDateTime date;
 
     // Конструкторы
     public Sale() {}
 
-    public Sale(Long id, Product product, Customer customer, LocalDate date, double weight, double totalCost) {
+    public Sale(Long id, Long productId, Long customerId, Double weight, LocalDateTime date) {
         this.id = id;
-        this.product = product;
-        this.customer = customer;
-        this.date = date;
+        this.productId = productId;
+        this.customerId = customerId;
         this.weight = weight;
-        this.totalCost = totalCost;
+        this.date = date;
     }
 
     // Геттеры и сеттеры
@@ -51,44 +45,36 @@ public class Sale {
         this.id = id;
     }
 
-    public Product getProduct() {
-        return product;
+    public Long getProductId() {
+        return productId;
     }
 
-    public void setProduct(Product product) {
-        this.product = product;
+    public void setProductId(Long productId) {
+        this.productId = productId;
     }
 
-    public Customer getCustomer() {
-        return customer;
+    public Long getCustomerId() {
+        return customerId;
     }
 
-    public void setCustomer(Customer customer) {
-        this.customer = customer;
+    public void setCustomerId(Long customerId) {
+        this.customerId = customerId;
     }
 
-    public LocalDate getDate() {
-        return date;
-    }
-
-    public void setDate(LocalDate date) {
-        this.date = date;
-    }
-
-    public double getWeight() {
+    public Double getWeight() {
         return weight;
     }
 
-    public void setWeight(double weight) {
+    public void setWeight(Double weight) {
         this.weight = weight;
     }
 
-    public double getTotalCost() {
-        return totalCost;
+    public LocalDateTime getDate() {
+        return date;
     }
 
-    public void setTotalCost(double totalCost) {
-        this.totalCost = totalCost;
+    public void setDate(LocalDateTime date) {
+        this.date = date;
     }
 
     // equals, hashCode, toString
@@ -97,28 +83,26 @@ public class Sale {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         Sale sale = (Sale) o;
-        return Double.compare(sale.weight, weight) == 0 &&
-                Double.compare(sale.totalCost, totalCost) == 0 &&
-                Objects.equals(id, sale.id) &&
-                Objects.equals(product, sale.product) &&
-                Objects.equals(customer, sale.customer) &&
+        return Objects.equals(id, sale.id) &&
+                Objects.equals(productId, sale.productId) &&
+                Objects.equals(customerId, sale.customerId) &&
+                Objects.equals(weight, sale.weight) &&
                 Objects.equals(date, sale.date);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, product, customer, date, weight, totalCost);
+        return Objects.hash(id, productId, customerId, weight, date);
     }
 
     @Override
     public String toString() {
         return "Sale{" +
                 "id=" + id +
-                ", product=" + product +
-                ", customer=" + customer +
-                ", date=" + date +
+                ", productId=" + productId +
+                ", customerId=" + customerId +
                 ", weight=" + weight +
-                ", totalCost=" + totalCost +
+                ", date=" + date +
                 '}';
     }
 }
