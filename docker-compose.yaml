@@ -20,8 +20,8 @@ services:
       SERVER_TOMCAT_MIN_SPARE_THREADS: ${TOMCAT_THREADS_MIN_SPARE}
       SPRING_JPA_SHOW_SQL: ${SPRING_JPA_SHOW_SQL}
       KAFKA_HOSTS: ${KAFKA_HOSTS:-hl22.zil:9094,hl23.zil:9094}
-      KAFKA_GROUP_ID: ${KAFKA_GROUP_ID:-hizhnyak-consumer-group}
-      KAFKA_TOPIC: ${KAFKA_TOPIC:-hizhnyak}
+      KAFKA_GROUP_ID: ${KAFKA_GROUP_ID:-hizhnyack-consumer-group}
+      KAFKA_TOPIC: ${KAFKA_TOPIC:-hizhnyack}
       KAFKA_CONCURRENCY: ${KAFKA_CONCURRENCY:-2}
     ports:
       - "8080:8080"
@@ -49,6 +49,13 @@ services:
     cpus: 1
     networks:
       - farmers-market-network
+
+
+ 
+
+volumes:
+  postgres_data:
+  pgadmin_data:
 
 networks:
   farmers-market-network:

@@ -1,6 +1,6 @@
 package ru.hpclab.hl.module1.model;
 
-import java.time.LocalDateTime;
+import java.time.LocalDate;
 import java.util.Objects;
 import javax.persistence.*;
 import lombok.Data;
@@ -13,27 +13,33 @@ public class Sale {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(name = "product_id", nullable = false)
-    private Long productId;
+    @ManyToOne
+    @JoinColumn(name = "product_id", nullable = false)
+    private Product product;
 
-    @Column(name = "customer_id", nullable = false)
-    private Long customerId;
+    @ManyToOne
+    @JoinColumn(name = "customer_id", nullable = false)
+    private Customer customer;
 
     @Column(nullable = false)
-    private Double weight;
+    private LocalDate date;
 
     @Column(nullable = false)
-    private LocalDateTime date;
+    private double weight;
+
+    @Column(nullable = false)
+    private double totalCost;
 
     // Конструкторы
     public Sale() {}
 
-    public Sale(Long id, Long productId, Long customerId, Double weight, LocalDateTime date) {
+    public Sale(Long id, Product product, Customer customer, LocalDate date, double weight, double totalCost) {
         this.id = id;
-        this.productId = productId;
-        this.customerId = customerId;
-        this.weight = weight;
+        this.product = product;
+        this.customer = customer;
         this.date = date;
+        this.weight = weight;
+        this.totalCost = totalCost;
     }
 
     // Геттеры и сеттеры
@@ -45,36 +51,44 @@ public class Sale {
         this.id = id;
     }
 
-    public Long getProductId() {
-        return productId;
+    public Product getProduct() {
+        return product;
     }
 
-    public void setProductId(Long productId) {
-        this.productId = productId;
+    public void setProduct(Product product) {
+        this.product = product;
     }
 
-    public Long getCustomerId() {
-        return customerId;
+    public Customer getCustomer() {
+        return customer;
     }
 
-    public void setCustomerId(Long customerId) {
-        this.customerId = customerId;
+    public void setCustomer(Customer customer) {
+        this.customer = customer;
     }
 
-    public Double getWeight() {
-        return weight;
-    }
-
-    public void setWeight(Double weight) {
-        this.weight = weight;
-    }
-
-    public LocalDateTime getDate() {
+    public LocalDate getDate() {
         return date;
     }
 
-    public void setDate(LocalDateTime date) {
+    public void setDate(LocalDate date) {
         this.date = date;
+    }
+
+    public double getWeight() {
+        return weight;
+    }
+
+    public void setWeight(double weight) {
+        this.weight = weight;
+    }
+
+    public double getTotalCost() {
+        return totalCost;
+    }
+
+    public void setTotalCost(double totalCost) {
+        this.totalCost = totalCost;
     }
 
     // equals, hashCode, toString
@@ -83,26 +97,28 @@ public class Sale {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         Sale sale = (Sale) o;
-        return Objects.equals(id, sale.id) &&
-                Objects.equals(productId, sale.productId) &&
-                Objects.equals(customerId, sale.customerId) &&
-                Objects.equals(weight, sale.weight) &&
+        return Double.compare(sale.weight, weight) == 0 &&
+                Double.compare(sale.totalCost, totalCost) == 0 &&
+                Objects.equals(id, sale.id) &&
+                Objects.equals(product, sale.product) &&
+                Objects.equals(customer, sale.customer) &&
                 Objects.equals(date, sale.date);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, productId, customerId, weight, date);
+        return Objects.hash(id, product, customer, date, weight, totalCost);
     }
 
     @Override
     public String toString() {
         return "Sale{" +
                 "id=" + id +
-                ", productId=" + productId +
-                ", customerId=" + customerId +
-                ", weight=" + weight +
+                ", product=" + product +
+                ", customer=" + customer +
                 ", date=" + date +
+                ", weight=" + weight +
+                ", totalCost=" + totalCost +
                 '}';
     }
 }

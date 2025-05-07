@@ -18,8 +18,8 @@ public class Product {
     @Column(nullable = false)
     private String category; // Овощи/Фрукты
 
-    @Column(name = "price_per_kg", nullable = false)
-    private Double pricePerKg;
+    @Column(nullable = false)
+    private double pricePerKg;
 
     // Конструкторы
     public Product() {}

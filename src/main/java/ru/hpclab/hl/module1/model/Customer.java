@@ -12,14 +12,14 @@ public class Customer {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(name = "full_name", nullable = false)
+    @Column(nullable = false)
     private String fullName;
 
     @Column(nullable = false)
     private String phone;
 
-    @Column(name = "has_discount_card", nullable = false)
-    private Boolean hasDiscountCard;
+    @Column(nullable = false)
+    private boolean hasDiscountCard;
     // Конструкторы
     public Customer() {}
 
